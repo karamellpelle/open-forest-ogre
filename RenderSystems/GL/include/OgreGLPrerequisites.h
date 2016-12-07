@@ -1,3 +1,4 @@
+// karamellpelle: removed glew
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
@@ -75,11 +76,11 @@ namespace Ogre {
 
 #if OGRE_THREAD_SUPPORT == 1
 	// implemented in OgreGLContext.cpp
-	GLEWContext * glewGetContext();
+	//GLEWContext * glewGetContext();
 
 #	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	// implemented in OgreWin32Context.cpp
-	WGLEWContext * wglewGetContext();
+	//WGLEWContext * wglewGetContext();
 #	endif
 
 #endif

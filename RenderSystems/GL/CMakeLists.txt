@@ -7,6 +7,13 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
+################################################################################
+# karamellpelle
+# find library GLEW
+find_package( GLEW REQUIRED )
+include_directories( ${GLEW_INCLUDE_DIRS} )
+
+
 # Configure OpenGL RenderSystem build
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
@@ -87,11 +94,12 @@ include_directories(
   ${OGRE_SOURCE_DIR}/OgreMain/include/Threading
 )
 
-if(NOT APPLE)
-  include_directories(
-    ${OPENGL_INCLUDE_DIR}
-  )
-endif()
+# karamellpelle
+#if(NOT APPLE)
+#  include_directories(
+#    ${OPENGL_INCLUDE_DIR}
+#  )
+#endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile

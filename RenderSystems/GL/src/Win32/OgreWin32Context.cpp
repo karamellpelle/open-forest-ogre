@@ -102,21 +102,22 @@ namespace Ogre {
 #if OGRE_THREAD_SUPPORT == 1
 
 // declared in OgreGLPrerequisites.h 
-WGLEWContext * wglewGetContext()
-{
-	using namespace Ogre;
-	static OGRE_THREAD_POINTER_VAR(WGLEWContext, WGLEWContextsPtr);
-
-	WGLEWContext * currentWGLEWContextsPtr = OGRE_THREAD_POINTER_GET(WGLEWContextsPtr);
-	if (currentWGLEWContextsPtr == NULL)
-	{
-		currentWGLEWContextsPtr = new WGLEWContext();
-		OGRE_THREAD_POINTER_SET(WGLEWContextsPtr, currentWGLEWContextsPtr);
-		ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
-		wglewInit();
-
-	}
-	return currentWGLEWContextsPtr;
-}
+// karamellpelle: removed glew
+//WGLEWContext * wglewGetContext()
+//{
+//	using namespace Ogre;
+//	static OGRE_THREAD_POINTER_VAR(WGLEWContext, WGLEWContextsPtr);
+//
+//	WGLEWContext * currentWGLEWContextsPtr = OGRE_THREAD_POINTER_GET(WGLEWContextsPtr);
+//	if (currentWGLEWContextsPtr == NULL)
+//	{
+//		currentWGLEWContextsPtr = new WGLEWContext();
+//		OGRE_THREAD_POINTER_SET(WGLEWContextsPtr, currentWGLEWContextsPtr);
+//		ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
+//		wglewInit();
+//
+//	}
+//	return currentWGLEWContextsPtr;
+//}
 
 #endif

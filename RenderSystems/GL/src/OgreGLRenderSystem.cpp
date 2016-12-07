@@ -59,7 +59,7 @@ THE SOFTWARE.
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #if OGRE_THREAD_SUPPORT != 1
-GLenum GLEWAPIENTRY glewContextInit (Ogre::GLSupport *glSupport);
+//GLenum GLEWAPIENTRY glewContextInit (Ogre::GLSupport *glSupport); // karamellpelle:removed glew
 #endif
 
 namespace Ogre {
@@ -896,10 +896,11 @@ namespace Ogre {
 		if(caps->hasCapability(RSC_FBO) && rttMode < 1)
 		{
 			// Before GL version 2.0, we need to get one of the extensions
-			if(caps->hasCapability(RSC_FBO_ARB))
-				GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
-			else if(caps->hasCapability(RSC_FBO_ATI))
-				GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
+                        // karamellpelle: removed glew
+			//if(caps->hasCapability(RSC_FBO_ARB))
+			//	GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
+			//else if(caps->hasCapability(RSC_FBO_ATI))
+			//	GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
 
 			if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 			{
@@ -1211,7 +1212,7 @@ namespace Ogre {
 
 		// Get extension function pointers
 #if OGRE_THREAD_SUPPORT != 1
-		glewContextInit(mGLSupport);
+		//glewContextInit(mGLSupport); // karamellpelle: removed glew
 #endif
 
 		mStateCacheManager->switchContext((intptr_t)mCurrentContext);

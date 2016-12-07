@@ -727,7 +727,7 @@ char *yytext;
 #  endif
 #  include <windows.h>
 #endif
-#include <GL/glew.h>
+//#include <GL/glew.h> // karamellpelle: removed glew
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
 

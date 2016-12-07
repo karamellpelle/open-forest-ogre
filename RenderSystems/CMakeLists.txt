@@ -9,6 +9,9 @@
 
 # Configure RenderSystem build
 
+
+################################################################################
+
 if (OGRE_BUILD_RENDERSYSTEM_D3D9)
   if (NOT DirectX9_FOUND)
     MESSAGE(STATUS "Could not find dependency: DirectX")

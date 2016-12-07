@@ -41,7 +41,7 @@
 using namespace Ogre;
 
 #if OGRE_THREAD_SUPPORT != 1
-GLenum GLEWAPIENTRY wglewContextInit (Ogre::GLSupport *glSupport);
+//GLenum GLEWAPIENTRY wglewContextInit (Ogre::GLSupport *glSupport); // karamellpelle: removed glew
 #endif
 
 namespace Ogre {
@@ -440,7 +440,7 @@ namespace Ogre {
 		GLSupport::initialiseExtensions();
 		// wglew init
 #if OGRE_THREAD_SUPPORT != 1
-		wglewContextInit(this);
+		//wglewContextInit(this); // karamellpelle: removed glew
 #endif
 
 		// Check for W32 specific extensions probe function
@@ -574,30 +574,31 @@ namespace Ogre {
 				unsigned int count;
                 // cheating here.  wglChoosePixelFormatARB procc address needed later on
                 // when a valid GL context does not exist and glew is not initialized yet.
-                WGLEW_GET_FUN(__wglewChoosePixelFormatARB) =
-                    (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-                if (WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, iattr, 0, 256, formats, &count))
-                {
-                    // determine what multisampling levels are offered
-                    int query = WGL_SAMPLES_ARB, samples;
-                    for (unsigned int i = 0; i < count; ++i)
-                    {
-                        PFNWGLGETPIXELFORMATATTRIBIVARBPROC _wglGetPixelFormatAttribivARB =
-                            (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)
-                            wglGetProcAddress("wglGetPixelFormatAttribivARB");
-                        if (_wglGetPixelFormatAttribivARB(hdc, formats[i], 0, 1, &query, &samples))
-                        {
-                            mFSAALevels.push_back(samples);
-                        }
-                    }
-                    remove_duplicates(mFSAALevels);
-                }
-			}
-			
-			wglMakeCurrent(oldhdc, oldrc);
-			wglDeleteContext(hrc);
-		}
-
+                // karamellpelle: removed glew
+                //WGLEW_GET_FUN(__wglewChoosePixelFormatARB) =
+                //    (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+                //if (WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, iattr, 0, 256, formats, &count))
+                //{
+                //    // determine what multisampling levels are offered
+                //    int query = WGL_SAMPLES_ARB, samples;
+                //    for (unsigned int i = 0; i < count; ++i)
+                //    {
+                //        PFNWGLGETPIXELFORMATATTRIBIVARBPROC _wglGetPixelFormatAttribivARB =
+                //            (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)
+                //            wglGetProcAddress("wglGetPixelFormatAttribivARB");
+                //        if (_wglGetPixelFormatAttribivARB(hdc, formats[i], 0, 1, &query, &samples))
+                //        {
+                //            mFSAALevels.push_back(samples);
+                //        }
+                //    }
+                //    remove_duplicates(mFSAALevels);
+                //}
+		//	}
+		//	
+		//	wglMakeCurrent(oldhdc, oldrc);
+		//	wglDeleteContext(hrc);
+		//}
+                //
 		// clean up our dummy window and class
 		DestroyWindow(hwnd);
 		UnregisterClass(dummyText, hinst);
@@ -631,39 +632,40 @@ namespace Ogre {
 		if (hwGamma && !mHasHardwareGamma)
 			return false;
 		
-		if ((multisample || hwGamma) && WGLEW_GET_FUN(__wglewChoosePixelFormatARB))
-		{
-
-			// Use WGL to test extended caps (multisample, sRGB)
-			vector<int>::type attribList;
-			attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(GL_TRUE);
-			attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(GL_TRUE);
-			attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(GL_TRUE);
-			attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(GL_TRUE);
-			attribList.push_back(WGL_ACCELERATION_ARB); attribList.push_back(WGL_FULL_ACCELERATION_ARB);
-			attribList.push_back(WGL_COLOR_BITS_ARB); attribList.push_back(pfd.cColorBits);
-			attribList.push_back(WGL_ALPHA_BITS_ARB); attribList.push_back(pfd.cAlphaBits);
-			attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
-			attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
-			attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
-			if (useHwGamma && mHasHardwareGamma)
-			{
-				attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);
-			}
-			// terminator
-			attribList.push_back(0);
-
-
-			UINT nformats;
-			// ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
-			// since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
-			if (!WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
-				return false;
-		}
-		else
-		{
-			format = ChoosePixelFormat(hdc, &pfd);
-		}
+                // karamellpelle: removed glew
+		//if ((multisample || hwGamma) && WGLEW_GET_FUN(__wglewChoosePixelFormatARB))
+		//{
+                //
+		//	// Use WGL to test extended caps (multisample, sRGB)
+		//	vector<int>::type attribList;
+		//	attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(GL_TRUE);
+		//	attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(GL_TRUE);
+		//	attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(GL_TRUE);
+		//	attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(GL_TRUE);
+		//	attribList.push_back(WGL_ACCELERATION_ARB); attribList.push_back(WGL_FULL_ACCELERATION_ARB);
+		//	attribList.push_back(WGL_COLOR_BITS_ARB); attribList.push_back(pfd.cColorBits);
+		//	attribList.push_back(WGL_ALPHA_BITS_ARB); attribList.push_back(pfd.cAlphaBits);
+		//	attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
+		//	attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
+		//	attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
+		//	if (useHwGamma && mHasHardwareGamma)
+		//	{
+		//		attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);
+		//	}
+		//	// terminator
+		//	attribList.push_back(0);
+                //
+                //
+		//	UINT nformats;
+		//	// ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
+		//	// since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
+		//	if (!WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
+		//		return false;
+		//}
+		//else
+		//{
+		//	format = ChoosePixelFormat(hdc, &pfd);
+		//}
 
 
 		return (format && SetPixelFormat(hdc, format, &pfd));

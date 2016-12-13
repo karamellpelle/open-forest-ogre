@@ -129,6 +129,8 @@ namespace Ogre {
 	
     String macBundlePath()
     {
+    // karamellpelle
+
         char path[1024];
         CFBundleRef mainBundle = CFBundleGetMainBundle();
         assert(mainBundle);
@@ -143,7 +145,12 @@ namespace Ogre {
         
         CFRelease(mainBundleURL);
         CFRelease(cfStringRef);
-        
+
+       //printf( "Main bundle path: %s\n", path ); 
+
+        // we put our plugin stuff here (relative path)
+        //char* path = "";
+
         return String(path);
     }
     
@@ -162,6 +169,8 @@ namespace Ogre {
 
     String macFrameworksPath()
 	{
+          // this will not be called by OgreDynLib if plugin load succeeds; see
+          // OgreDynLib::load(). Framework is fallback
 		return macBundlePath() + "/Contents/Frameworks/";
 	}
 

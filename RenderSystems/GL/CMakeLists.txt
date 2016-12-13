@@ -121,6 +121,10 @@ if (APPLE)
         LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL -framework AGL")
 endif ()
 
+
+# karamellpelle: adding system GLEW
+target_link_libraries( RenderSystem_GL ${GLEW_LIBRARIES} )
+
 ogre_config_framework(RenderSystem_GL)
 
 ogre_config_plugin(RenderSystem_GL)

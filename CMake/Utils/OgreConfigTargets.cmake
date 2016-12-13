@@ -254,11 +254,16 @@ function(ogre_config_framework LIBNAME)
   if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
       set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
 
+      # karamellpelle: removed; see
+      # * https://cmake.org/Wiki/CMake_RPATH_handling#CMake_and_the_RPATH
+      # * https://blog.kitware.com/upcoming-in-cmake-2-8-12-osx-rpath-support/
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
-      set_target_properties(${LIBNAME}
-         PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-         INSTALL_NAME_DIR "@executable_path/../Frameworks"
-      )
+      #set_target_properties(${LIBNAME}
+      #   #PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+      #   #INSTALL_NAME_DIR "@executable_path/../Frameworks"
+      #   #INSTALL_NAME_DIR "@rpath/Frameworks" # karamellpelle
+      #)
+
       set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")

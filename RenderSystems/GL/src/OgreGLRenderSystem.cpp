@@ -1084,11 +1084,11 @@ namespace Ogre {
 			}
 			LogManager::getSingleton().logMessage(ss.str());
 		}
-
 		// Create the window
 		RenderWindow* win = mGLSupport->newWindow(name, width, height, 
 			fullScreen, miscParams);
 
+#if 0
 		attachRenderTarget( *win );
 
 		if (!mGLInitialised) 
@@ -1146,7 +1146,7 @@ namespace Ogre {
 
 			win->attachDepthBuffer( depthBuffer );
 		}
-
+#endif
 		return win;
 	}
 	//---------------------------------------------------------------------

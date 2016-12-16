@@ -1212,14 +1212,14 @@ namespace Ogre {
         }
         RenderWindow* ret;
         ret = mActiveRenderer->_createRenderWindow(name, width, height, fullScreen, miscParams);
-
+/*
         // Initialisation for classes dependent on first window created
         if(!mFirstTimePostWindowInit)
         {
             oneTimePostWindowInit();
             ret->_setPrimary();
         }
-
+*/
         return ret;
 
     }

@@ -41,6 +41,10 @@ THE SOFTWARE.
 #include <iostream>
 #include <climits>
 
+// karamellpelle: found #define GLX_RGBA_FLOAT_BIT_ARB instead:
+#define GLX_RGBA_FLOAT_BIT 0x00000004
+
+
 namespace Ogre
 {
 	//-------------------------------------------------------------------------------------------------//

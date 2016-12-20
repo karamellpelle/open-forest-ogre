@@ -727,7 +727,7 @@ char *yytext;
 #  endif
 #  include <windows.h>
 #endif
-#include <GL/glew.h>
+#include "GLX/OgreGL/ogreglew.h"
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
 

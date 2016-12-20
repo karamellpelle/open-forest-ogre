@@ -3,8 +3,8 @@
 
 #include "OgreGLSupport.h"
 
-#include <GL/glew.h>
-#include <GL/glxew.h>
+#include "GLX/OgreGL/ogreglew.h"
+#include "GLX/OgreGL/glxew.h"
 
 namespace Ogre {
 

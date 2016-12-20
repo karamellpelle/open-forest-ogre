@@ -29,16 +29,17 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "GLX/OgreGL/ogreglew.h"
+
 // SJS
 #include "OgreGLSupport.h"
 // SJS
 
-#include <GL/glew.h>
 
 #if defined(_WIN32)
-#  include <GL/wglew.h>
+#  include "GLX/OgreGL/wglew.h"
 #elif !defined(__ANDROID__) && (!defined(__APPLE__) || defined(GLEW_APPLE_GLX))
-#  include <GL/glxew.h>
+#  include "GLX/OgreGL/glxew.h"
 #endif
 
 /*

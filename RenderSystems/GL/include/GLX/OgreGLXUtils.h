@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define __GLXUtils_H__
 
 #include "OgrePrerequisites.h"
-#include <GL/glew.h>
-#include <GL/glxew.h>
+#include "GLX/OgreGL/ogreglew.h"
+#include "GLX/OgreGL/glxew.h"
 
 namespace Ogre 
 {

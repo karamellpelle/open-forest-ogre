@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <OgreGLPrerequisites.h>
-#include <GL/glew.h>
+#include "GLX/OgreGL/ogreglew.h"
 
 #define RCP_NUM_GENERAL_COMBINERS 8
 

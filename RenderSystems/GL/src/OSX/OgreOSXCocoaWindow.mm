@@ -367,25 +367,32 @@ namespace Ogre {
         << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
         LogManager::getSingleton().logMessage(ss.str());
     }
-
+static unsigned int win_wth = 0;
+static unsigned int win_hth = 0;
     unsigned int OSXCocoaWindow::getWidth() const
     {
+    /*
         NSRect winFrame;
         if(mContentScalingSupported && mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
+        */
+        return win_wth;
     }
 
     unsigned int OSXCocoaWindow::getHeight() const
     {
+    /*
         NSRect winFrame;
         if(mContentScalingSupported && mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
+    */
+        return win_hth;
     }
 
     void OSXCocoaWindow::destroy(void)
@@ -531,48 +538,51 @@ namespace Ogre {
 
     void OSXCocoaWindow::resize(unsigned int width, unsigned int height)
     {
-		if(!mWindow)
-            return;
-        
-        if(mIsFullScreen)
-            return;
+       win_wth = width;
+       win_hth = height;
 
-        // Check if the window size really changed
-        if(mWidth == width && mHeight == height)
-            return;
-
-        mWidth = width * mContentScalingFactor;
-        mHeight = height * mContentScalingFactor;
-
-        if(mIsExternal)
-        {
-            NSRect viewFrame = [mView frame];
-            viewFrame.size.width = width;
-            viewFrame.size.height = height;
-
-            NSRect windowFrame = [[mView window] frame];
-
-            mLeft = viewFrame.origin.x;
-            mTop = windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height);
-            mWindowOrigin = NSMakePoint(mLeft, mTop);
-
-            GLint bufferRect[4];
-            bufferRect[0] = mLeft;      // 0 = left edge 
-            bufferRect[1] = mTop;       // 0 = bottom edge 
-            bufferRect[2] = mWidth;     // width of buffer rect 
-            bufferRect[3] = mHeight;    // height of buffer rect 
-            CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
-            CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-        }
-        else
-        {
-            NSRect frame = [mWindow frame];
-            frame.size.width = width;
-            frame.size.height = height;
-            mWindowOrigin = frame.origin;
-            [mWindow setFrame:frame display:YES];
-        }
-		[mGLContext update];
+	//	if(!mWindow)
+        //    return;
+        //
+        //if(mIsFullScreen)
+        //    return;
+        //
+        //// Check if the window size really changed
+        //if(mWidth == width && mHeight == height)
+        //    return;
+        //
+        //mWidth = width * mContentScalingFactor;
+        //mHeight = height * mContentScalingFactor;
+        //
+        //if(mIsExternal)
+        //{
+        //    NSRect viewFrame = [mView frame];
+        //    viewFrame.size.width = width;
+        //    viewFrame.size.height = height;
+        //
+        //    NSRect windowFrame = [[mView window] frame];
+        //
+        //    mLeft = viewFrame.origin.x;
+        //    mTop = windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height);
+        //    mWindowOrigin = NSMakePoint(mLeft, mTop);
+        //
+        //    GLint bufferRect[4];
+        //    bufferRect[0] = mLeft;      // 0 = left edge 
+        //    bufferRect[1] = mTop;       // 0 = bottom edge 
+        //    bufferRect[2] = mWidth;     // width of buffer rect 
+        //    bufferRect[3] = mHeight;    // height of buffer rect 
+        //    CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
+        //    CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
+        //}
+        //else
+        //{
+        //    NSRect frame = [mWindow frame];
+        //    frame.size.width = width;
+        //    frame.size.height = height;
+        //    mWindowOrigin = frame.origin;
+        //    [mWindow setFrame:frame display:YES];
+        //}
+	//	[mGLContext update];
     }
 
     void OSXCocoaWindow::windowResized()

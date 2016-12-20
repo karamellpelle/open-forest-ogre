@@ -34,33 +34,34 @@ namespace Ogre
     OSXCocoaContext::OSXCocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
       : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
 	{
-        if(mNSGLPixelFormat)
-            [mNSGLPixelFormat retain];
+        //if(mNSGLPixelFormat)
+        //    [mNSGLPixelFormat retain];
 	}
 	    
 	OSXCocoaContext::~OSXCocoaContext()
 	{
-		_unregisterContext();
-		
-        if(mNSGLPixelFormat)
-            [mNSGLPixelFormat release];
+	//	_unregisterContext();
+	//	
+        //if(mNSGLPixelFormat)
+        //    [mNSGLPixelFormat release];
     }
 
     void OSXCocoaContext::setCurrent()
 	{
-		[mNSGLContext makeCurrentContext];
+		//[mNSGLContext makeCurrentContext];
     }
 		
 	void OSXCocoaContext::endCurrent()
 	{
-        [NSOpenGLContext clearCurrentContext]; 
+        //[NSOpenGLContext clearCurrentContext]; 
 	}
 	
 	GLContext* OSXCocoaContext::clone() const
 	{
-		NSOpenGLContext *cloneCtx = [[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
-		[cloneCtx copyAttributesFromContext:mNSGLContext withMask:GL_ALL_ATTRIB_BITS];
-		return OGRE_NEW OSXCocoaContext(cloneCtx, mNSGLPixelFormat);
+		//NSOpenGLContext *cloneCtx = [[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
+		//[cloneCtx copyAttributesFromContext:mNSGLContext withMask:GL_ALL_ATTRIB_BITS];
+		//return OGRE_NEW OSXCocoaContext(cloneCtx, mNSGLPixelFormat);
+                return 0;
 	}
 	
 	String OSXCocoaContext::getContextType()
@@ -70,11 +71,13 @@ namespace Ogre
 	
 	NSOpenGLContext* OSXCocoaContext::getContext()
 	{
-		return mNSGLContext;
+		//return mNSGLContext;
+                return 0;
     }
   
 	NSOpenGLPixelFormat* OSXCocoaContext::getPixelFormat()
 	{
-		return mNSGLPixelFormat;
+		//return mNSGLPixelFormat;
+                return 0;
 	}
 }

@@ -83,21 +83,31 @@ namespace Ogre
     {
         outStream << "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n";
 
+        // GLSL < 1.20:
+        String in_ = "attribute ";
+        String out_ = "varying ";
+
         bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
         if (compression)
         {
             outStream <<
-                "in vec2 posIndex;\n"
-                "in float height;\n";
+                //"in vec2 posIndex;\n"
+                //"in float height;\n";
+                in_ << "vec2 posIndex;\n" <<
+                in_ << "float height;\n";
         }
         else
         {
             outStream <<
-                "in vec4 position;\n"
-                "in vec2 uv0;\n";
+                //"in vec4 position;\n"
+                //"in vec2 uv0;\n";
+                in_ << "vec4 position;\n" << 
+                in_ << "vec2 uv0;\n";
         }
         if (tt != RENDER_COMPOSITE_MAP)
-            outStream << "in vec2 delta;\n"; // lodDelta, lodThreshold
+            //outStream << "in vec2 delta;\n"; // lodDelta, lodThreshold
+            outStream  << 
+                in_ << "vec2 delta;\n"; // lodDelta, lodThreshold
 
         outStream <<
             "uniform mat4 worldMatrix;\n"
@@ -120,11 +130,13 @@ namespace Ogre
             outStream << "uniform vec4 uvMul_" << i << ";\n";
 
         outStream <<
-            "out vec4 oPosObj;\n";
+            //"out vec4 oPosObj;\n";
+            out_ << "vec4 oPosObj;\n";
 
         uint texCoordSet = 1;
         outStream <<
-            "out vec4 oUVMisc; // xy = uv, z = camDepth\n";
+            //"out vec4 oUVMisc; // xy = uv, z = camDepth\n";
+            out_ << "vec4 oUVMisc; // xy = uv, z = camDepth\n";
 
         // layer UV's premultiplied, packed as xy/zw
         uint numUVSets = numLayers / 2;
@@ -135,21 +147,25 @@ namespace Ogre
             for (uint i = 0; i < numUVSets; ++i)
             {
                 outStream <<
-                    "out vec4 layerUV" << i << ";\n";
+                    //"out vec4 layerUV" << i << ";\n";
+                    out_ << "vec4 layerUV" << i << ";\n";
             }
         }
 
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
-            outStream << "out vec2 lodInfo;\n";
+            //outStream << "out vec2 lodInfo;\n";
+            outStream  << 
+                out_ << "vec2 lodInfo;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
             outStream <<
-                "uniform vec4 fogParams;\n"
-                "out float fogVal;\n";
+                "uniform vec4 fogParams;\n" <<
+                //"out float fogVal;\n";
+                out_ << "float fogVal;\n";
         }
 
         if (prof->isShadowingEnabled(tt, terrain))
@@ -169,6 +185,8 @@ namespace Ogre
         if (compression)
         {
             outStream <<
+                //"    vec4 position = posIndexToObjectSpace * vec4(posIndex, height, 1);\n"
+                //"    vec2 uv0 = vec2(posIndex.x * baseUVScale, 1.0 - (posIndex.y * baseUVScale));\n";
                 "    vec4 position = posIndexToObjectSpace * vec4(posIndex, height, 1);\n"
                 "    vec2 uv0 = vec2(posIndex.x * baseUVScale, 1.0 - (posIndex.y * baseUVScale));\n";
         }
@@ -232,6 +250,10 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+        String in_ = "varying ";
+        String out_ = "";
+        String fragColor_ = "gl_FragColor";
+
         // Main header
         outStream <<
             // helpers
@@ -247,13 +269,22 @@ namespace Ogre
             "    float specular = step(0.0, NdotL) * max(NdotH, 0.0);\n"
             "    return vec4(ambient, diffuse, specular, 1.0);\n"
             "}\n\n";
+          
+          // FIXME : if version < 1.20
+            //outStream << "#define texture2D texture\n";
+            //outStream << "#define texture3D texture\n";
+            //outStream << "#define textureCube texture\n";
 
         if (prof->isShadowingEnabled(tt, terrain))
             generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
 
-        outStream << "in vec4 oPosObj;\n"
-                     "in vec4 oUVMisc;\n"
-                     "out vec4 fragColour;\n";
+        //outStream << "in vec4 oPosObj;\n"
+        //             "in vec4 oUVMisc;\n"
+        //             "out vec4 fragColour;\n";
+        outStream << 
+                  in_ << "vec4 oPosObj;\n" <<
+                  in_ << "vec4 oUVMisc;\n" <<
+                  "//out vec4 fragColour;\n"; // FIXME!
 
         uint texCoordSet = 1;
 
@@ -269,20 +300,24 @@ namespace Ogre
             for (uint i = 0; i < numUVSets; ++i)
             {
                 outStream <<
-                    "in vec4 layerUV" << i << ";\n";
+                    //"in vec4 layerUV" << i << ";\n";
+                    in_ << "vec4 layerUV" << i << ";\n";
             }
         }
         if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
         {
-            outStream << "in vec2 lodInfo;\n";
+            outStream << 
+                //"in vec2 lodInfo;\n";
+                in_ << "vec2 lodInfo;\n";
         }
 
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
             outStream <<
-                "uniform vec3 fogColour;\n"
-                "in float fogVal;\n";
+                "uniform vec3 fogColour;\n" <<
+                //"in float fogVal;\n";
+                in_ << "float fogVal;\n";
         }
 
         uint currentSamplerIdx = 0;
@@ -345,16 +380,30 @@ namespace Ogre
         }
 
         outStream << "void main(void) {\n"
-            "    float shadow = 1.0;\n"
-            "    vec2 uv = oUVMisc.xy;\n"
+            << "    float shadow = 1.0;\n"
+            << "    vec2 uv = oUVMisc.xy;\n"
             // base colour
-            "    fragColour = vec4(0,0,0,1);\n";
+            //"    fragColour = vec4(0,0,0,1);\n";
+            //<< fragColor_ << " = vec4(0,0,0,1);\n"; // do not write here
+            ;
+        // karamellpelle FIXME
+        // base colour
+        //if(glslVersion > 100)
+        //{
+        //    outStream << "    fragColour = vec4(0,0,0,1);\n";
+        //}
+        //else
+        {
+            //outStream << "    gl_FragColor = vec4(0,0,0,1);\n";
+            outStream << "    gl_FragColor = vec4(0.0,0.0,0.9,1.0);\n"; // FIXME!!!
+        }
 
         if (tt != LOW_LOD)
         {
             outStream <<
                 // global normal
-                "    vec3 normal = expand(texture(globalNormal, uv)).rgb;\n";
+                //"    vec3 normal = expand(texture(globalNormal, uv)).rgb;\n"; // karamellpelle
+                "    vec3 normal = expand(texture2D(globalNormal, uv)).rgb;\n";
         }
 
         outStream <<
@@ -370,7 +419,10 @@ namespace Ogre
         {
             // we just do a single calculation from composite map
             outStream <<
-                "    vec4 composite = texture(compositeMap, uv);\n"
+                //"    vec4 composite = texture(compositeMap, uv);\n"
+                //"    diffuse = composite.rgb;\n";
+                // karamellpelle
+                "    vec4 composite = texture2D(compositeMap, uv);\n"
                 "    diffuse = composite.rgb;\n";
             // TODO - specular; we'll need normals for this!
         }
@@ -379,7 +431,9 @@ namespace Ogre
             // set up the blend values
             for (uint i = 0; i < numBlendTextures; ++i)
             {
-                outStream << "    vec4 blendTexVal" << i << " = texture(blendTex" << i << ", uv);\n";
+                //outStream << "    vec4 blendTexVal" << i << " = texture(blendTex" << i << ", uv);\n";
+                // karamellpelle
+                outStream << "    vec4 blendTexVal" << i << " = texture2D(blendTex" << i << ", uv);\n";
             }
 
             if (prof->isLayerNormalMappingEnabled())
@@ -455,13 +509,26 @@ namespace Ogre
             if (prof->isLayerParallaxMappingEnabled() && tt != RENDER_COMPOSITE_MAP)
             {
                 // modify UV - note we have to sample an extra time
-                outStream << "    displacement = texture(normtex" << layer << ", uv" << layer << ").a\n"
+                //outStream << "    displacement = texture(normtex" << layer << ", uv" << layer << ").a\n"
+                //             "        * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
+                //outStream << "    uv" << layer << " += TSeyeDir.xy * displacement;\n";
+                // karamellpelle
+                outStream << "    displacement = texture2D(normtex" << layer << ", uv" << layer << ").a\n"
                              "        * scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
                 outStream << "    uv" << layer << " += TSeyeDir.xy * displacement;\n";
             }
 
+            //// access TS normal map
+            //outStream << "    TSnormal = expand(texture(normtex" << layer << ", uv" << layer << ")).rgb;\n";
+            //outStream << "    TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
+            //outStream << "    litResLayer = lit(dot(TSnormal, TSlightDir), dot(TSnormal, TShalfAngle), scaleBiasSpecular.z);\n";
+            //if (!layer)
+            //    outStream << "    litRes = litResLayer;\n";
+            //else
+            //    outStream << "    litRes = mix(litRes, litResLayer, " << blendWeightStr << ");\n";
+            // karamellpelle
             // access TS normal map
-            outStream << "    TSnormal = expand(texture(normtex" << layer << ", uv" << layer << ")).rgb;\n";
+            outStream << "    TSnormal = expand(texture2D(normtex" << layer << ", uv" << layer << ")).rgb;\n";
             outStream << "    TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
             outStream << "    litResLayer = lit(dot(TSnormal, TSlightDir), dot(TSnormal, TShalfAngle), scaleBiasSpecular.z);\n";
             if (!layer)
@@ -471,9 +538,28 @@ namespace Ogre
 
         }
 
-        // sample diffuse texture
+        //// sample diffuse texture
+        //outStream << "    vec4 diffuseSpecTex" << layer
+        //    << " = texture(difftex" << layer << ", uv" << layer << ");\n";
+        //
+        //// apply to common
+        //if (!layer)
+        //{
+        //    outStream << "    diffuse = diffuseSpecTex0.rgb;\n";
+        //    if (prof->isLayerSpecularMappingEnabled())
+        //        outStream << "    specular = diffuseSpecTex0.a;\n";
+        //}
+        //else
+        //{
+        //    outStream << "    diffuse = mix(diffuse, diffuseSpecTex" << layer
+        //        << ".rgb, " << blendWeightStr << ");\n";
+        //    if (prof->isLayerSpecularMappingEnabled())
+        //        outStream << "    specular = mix(specular, diffuseSpecTex" << layer
+        //            << ".a, " << blendWeightStr << ");\n";
+        //}
+        // karamellpelle
         outStream << "    vec4 diffuseSpecTex" << layer
-            << " = texture(difftex" << layer << ", uv" << layer << ");\n";
+            << " = texture2D(difftex" << layer << ", uv" << layer << ");\n";
 
         // apply to common
         if (!layer)
@@ -490,6 +576,7 @@ namespace Ogre
                 outStream << "    specular = mix(specular, diffuseSpecTex" << layer
                     << ".a, " << blendWeightStr << ");\n";
         }
+
 
         // End early-out
         /* Disable - causing some issues even when trying to force the use of texldd
@@ -529,18 +616,27 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+        String in_ = "varying ";
+        String out_ = "";
+        String fragColor_ = "gl_FragColor";
+
         if (tt == LOW_LOD)
         {
             if (prof->isShadowingEnabled(tt, terrain))
             {
                 generateFpDynamicShadows(prof, terrain, tt, outStream);
                 outStream <<
-                    "    fragColour.rgb = diffuse * rtshadow;\n";
+                    //"    fragColour.rgb = diffuse * rtshadow;\n";
+                    //fragColor_ << ".rgb = diffuse * rtshadow;\n";
+                    //fragColor_ << " = vect.rgb = diffuse * rtshadow;\n";
+                    fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
             }
             else
             {
                 outStream <<
-                    "    fragColour.rgb = diffuse;\n";
+                    //"    fragColour.rgb = diffuse;\n";
+                    //fragColor_ << ".rgb = diffuse;\n";
+                    fragColor_ << "= vec4(0.9,0.0,0.0,1.0);\n"; // FIXME!!!
             }
         }
         else
@@ -548,12 +644,15 @@ namespace Ogre
             if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
             {
                 // sample colour map and apply to diffuse
-                outStream << "    diffuse *= texture(globalColourMap, uv).rgb;\n";
+                //outStream << "    diffuse *= texture(globalColourMap, uv).rgb;\n";
+                // karamellpelle
+                outStream << "    diffuse *= texture2D(globalColourMap, uv).rgb;\n";
             }
             if (prof->isLightmapEnabled())
             {
                 // sample lightmap
-                outStream << "    shadow = texture(lightMap, uv).r;\n";
+                //outStream << "    shadow = texture(lightMap, uv).r;\n";
+                outStream << "    shadow = texture2D(lightMap, uv).r;\n"; // karamellpelle
             }
 
             if (prof->isShadowingEnabled(tt, terrain))
@@ -562,7 +661,10 @@ namespace Ogre
             }
 
             // diffuse lighting
-            outStream << "    fragColour.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            outStream << 
+                  //"    fragColour.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+                  //fragColor_ << ".rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+                    fragColor_ << "= vec4(0.0,0.9,0.9,1.0);\n"; // FIXME!!!
 
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
@@ -572,16 +674,24 @@ namespace Ogre
             {
                 // Lighting embedded in alpha
                 outStream <<
-                    "    fragColour.a = shadow;\n";
+                    //"    fragColour.a = shadow;\n";
+                    //fragColor_ << ".a = shadow;\n";
+                    fragColor_ << "= vec4(0.9,0.0,0.9,1.0);\n"; // FIXME!!!
             }
             else
             {
                 // Apply specular
-                outStream << "    fragColour.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                outStream << 
+                      //"    fragColour.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                      //fragColor_ << ".rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                    fragColor_ << "= vec4(0.9,0.5,0.9,1.0);\n"; // FIXME!!!
 
                 if (prof->getParent()->getDebugLevel())
                 {
-                    outStream << "    fragColour.rg += lodInfo.xy;\n";
+                    outStream << 
+                        //"    fragColour.rg += lodInfo.xy;\n";
+                        //fragColor_ << ".rg += lodInfo.xy;\n";
+                    fragColor_ << "= vec4(0.5,0.9,0.0,1.0);\n"; // FIXME!!!
                 }
             }
         }
@@ -589,7 +699,11 @@ namespace Ogre
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
-            outStream << "    fragColour.rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
+            outStream << 
+                //"    fragColour.rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
+                //fragColor_ << ".rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
+                //fragColor_ << ".rgb = mix(" << fragColor_ <<".rgb, fogColour, fogVal);\n";
+                    fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
         }
 
         // Final return
@@ -601,6 +715,17 @@ namespace Ogre
     {
         // TODO make filtering configurable
         outStream <<
+            //"// Simple PCF \n"
+            //"// Number of samples in one dimension (square for total samples) \n"
+            //"#define NUM_SHADOW_SAMPLES_1D 2.0 \n"
+            //"#define SHADOW_FILTER_SCALE 1 \n"
+            //
+            //"#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D \n"
+            //
+            //"vec4 offsetSample(vec4 uv, vec2 offset, float invMapSize) \n"
+            //"{ \n"
+            //"    return vec4(uv.xy + offset * invMapSize * uv.w, uv.z, uv.w); \n"
+            //"} \n";
             "// Simple PCF \n"
             "// Number of samples in one dimension (square for total samples) \n"
             "#define NUM_SHADOW_SAMPLES_1D 2.0 \n"
@@ -616,6 +741,26 @@ namespace Ogre
         if (prof->getReceiveDynamicShadowsDepth())
         {
             outStream <<
+                //"float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize) \n"
+                //"{ \n"
+                //"    // 4-sample PCF \n"
+                //
+                //"    float shadow = 0.0; \n"
+                //"    float offset = (NUM_SHADOW_SAMPLES_1D/2 - 0.5) * SHADOW_FILTER_SCALE; \n"
+                //"    for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE) \n"
+                //"        for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE) \n"
+                //"        { \n"
+                //"            vec4 newUV = offsetSample(uv, vec2(x, y), invShadowMapSize);\n"
+                //"            // manually project and assign derivatives \n"
+                //"            // to avoid gradient issues inside loops \n"
+                //"            float depth = textureProjGrad(shadowMap, newUV.xyw, vec2(1.0), vec2(1.0)).x; \n"
+                //"            if (depth >= 1 || depth >= uv.z)\n"
+                //"                shadow += 1.0;\n"
+                //"        } \n"
+                //
+                //"    shadow /= SHADOW_SAMPLES; \n"
+                //"    return shadow; \n"
+                //"} \n";
                 "float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize) \n"
                 "{ \n"
                 "    // 4-sample PCF \n"
@@ -628,7 +773,9 @@ namespace Ogre
                 "            vec4 newUV = offsetSample(uv, vec2(x, y), invShadowMapSize);\n"
                 "            // manually project and assign derivatives \n"
                 "            // to avoid gradient issues inside loops \n"
-                "            float depth = textureProjGrad(shadowMap, newUV.xyw, vec2(1.0), vec2(1.0)).x; \n"
+                "            newUV = newUV / newUV.w; \n"
+                "            float depth = texture2DProj(shadowMap, newUV.xyz).x; \n"
+//                "            float depth = textureProjGrad(shadowMap, newUV.xyz, vec2(1), vec2(1)).x; \n"
                 "            if (depth >= 1 || depth >= uv.z)\n"
                 "                shadow += 1.0;\n"
                 "        } \n"
@@ -640,9 +787,13 @@ namespace Ogre
         else
         {
             outStream <<
+                //"float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos) \n"
+                //"{ \n"
+                //"    return textureProj(shadowMap, shadowMapPos).x; \n"
+                //"} \n";
                 "float calcSimpleShadow(sampler2D shadowMap, vec4 shadowMapPos) \n"
                 "{ \n"
-                "    return textureProj(shadowMap, shadowMapPos).x; \n"
+                "    return texture2DProj(shadowMap, shadowMapPos).x; \n"
                 "} \n";
         }
 
@@ -713,6 +864,10 @@ namespace Ogre
                                                                                                  const Terrain* terrain, TechniqueType tt,
                                                                                                  StringUtil::StrStreamType& outStream)
     {
+        // GLSL < 1.20:
+        String in_ = "attribute ";
+        String out_ = "varying ";
+
         // out semantics & params
         uint numTextures = 1;
         if (prof->getReceiveDynamicShadowsPSSM())
@@ -722,7 +877,8 @@ namespace Ogre
         for (uint i = 0; i < numTextures; ++i)
         {
             outStream <<
-                "    out vec4 oLightSpacePos" << i << ";\n" <<
+                //"    out vec4 oLightSpacePos" << i << ";\n" <<
+                out_ << "vec4 oLightSpacePos" << i << ";\n" <<
                 "    uniform mat4 texViewProjMatrix" << i << ";\n";
             if (prof->getReceiveDynamicShadowsDepth())
             {
@@ -768,6 +924,10 @@ namespace Ogre
                                                                                                  const SM2Profile* prof, const Terrain* terrain,
                                                                                                  TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+        String in_ = "varying ";
+        String out_ = "";
+        String fragColor_ = "gl_FragColor";
+
         if (tt == HIGH_LOD)
             mShadowSamplerStartHi = *sampler;
         else if (tt == LOW_LOD)
@@ -784,7 +944,8 @@ namespace Ogre
         for (uint i = 0; i < numTextures; ++i)
         {
             outStream <<
-                "in vec4 oLightSpacePos" << i << ";\n" <<
+                //"in vec4 oLightSpacePos" << i << ";\n" <<
+                in_ << "vec4 oLightSpacePos" << i << ";\n" <<
                 "uniform sampler2D shadowMap" << i << ";\n";
             *sampler = *sampler + 1;
             *texCoord = *texCoord + 1;

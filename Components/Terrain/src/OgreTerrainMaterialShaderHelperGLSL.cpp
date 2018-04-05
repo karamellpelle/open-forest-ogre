@@ -81,7 +81,21 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
-        outStream << "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n";
+outStream <<
+
+//attribute vec4 position;
+"\
+uniform mat4 worldMatrix;\n\
+uniform mat4 viewProjMatrix;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 worldPos = worldMatrix * position;\n\
+    gl_Position = viewProjMatrix * worldPos;\n\
+}\n\
+";
+#if 0
+        //outStream << "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n";
 
         // GLSL < 1.20:
         String in_ = "attribute ";
@@ -245,19 +259,28 @@ namespace Ogre
                     "    layerUV" << i << ".zw = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
             }
         }
+#endif
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpHeader(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+outStream <<"\
+void main()\n\
+{\n\
+    gl_FragColor= vec4(0.0,0.0,0.0,1.0);\n\
+}\n\
+";
+    //gl_FragColor= vec4(1.0,1.0,1.0,1.0);\n\
+
+#if 0
         String in_ = "varying ";
         String out_ = "";
         String fragColor_ = "gl_FragColor";
-
         // Main header
         outStream <<
             // helpers
-            "#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n"
+            //"#version " << Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() << "\n"
             "vec4 expand(vec4 v)\n"
             "{\n"
             "    return v * 2.0 - 1.0;\n"
@@ -395,7 +418,7 @@ namespace Ogre
         //else
         {
             //outStream << "    gl_FragColor = vec4(0,0,0,1);\n";
-            outStream << "    gl_FragColor = vec4(0.0,0.0,0.9,1.0);\n"; // FIXME!!!
+            //outStream << "    gl_FragColor = vec4(0.0,0.0,0.9,1.0);\n"; // FIXME!!!
         }
 
         if (tt != LOW_LOD)
@@ -477,6 +500,7 @@ namespace Ogre
                 outStream << "    vec4 litRes = lit(dot(normal, lightDir), dot(normal, halfAngle), scaleBiasSpecular.z);\n";
             }
         }
+#endif
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpLayer(const SM2Profile* prof, const Terrain* terrain,
@@ -488,6 +512,7 @@ namespace Ogre
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpLayer(const SM2Profile* prof, const Terrain* terrain,
                                                                                   TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
     {
+#if 0
         uint uvIdx = layer / 2;
         String uvChannels = (layer % 2) ? ".zw" : ".xy";
         uint blendIdx = (layer-1) / 4;
@@ -583,11 +608,13 @@ namespace Ogre
          if (layer && prof->_isSM3Available())
          outStream << "  } // early-out blend value\n";
          */
+#endif
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateVpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+#if 0
         outStream <<
             "    gl_Position = viewProjMatrix * worldPos;\n"
             "    oUVMisc.xy = uv0.xy;\n";
@@ -611,11 +638,13 @@ namespace Ogre
             generateVpDynamicShadows(prof, terrain, tt, outStream);
 
         outStream << "}\n";
+#endif
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpFooter(const SM2Profile* prof, const Terrain* terrain,
                                                                                    TechniqueType tt, StringUtil::StrStreamType& outStream)
     {
+#if 0
         String in_ = "varying ";
         String out_ = "";
         String fragColor_ = "gl_FragColor";
@@ -625,18 +654,18 @@ namespace Ogre
             if (prof->isShadowingEnabled(tt, terrain))
             {
                 generateFpDynamicShadows(prof, terrain, tt, outStream);
-                outStream <<
+                //outStream <<
                     //"    fragColour.rgb = diffuse * rtshadow;\n";
                     //fragColor_ << ".rgb = diffuse * rtshadow;\n";
                     //fragColor_ << " = vect.rgb = diffuse * rtshadow;\n";
-                    fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
+                    //fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
             }
             else
             {
-                outStream <<
+                //outStream <<
                     //"    fragColour.rgb = diffuse;\n";
                     //fragColor_ << ".rgb = diffuse;\n";
-                    fragColor_ << "= vec4(0.9,0.0,0.0,1.0);\n"; // FIXME!!!
+                    //fragColor_ << "= vec4(0.9,0.0,0.0,1.0);\n"; // FIXME!!!
             }
         }
         else
@@ -661,10 +690,10 @@ namespace Ogre
             }
 
             // diffuse lighting
-            outStream << 
-                  //"    fragColour.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
-                  //fragColor_ << ".rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
-                    fragColor_ << "= vec4(0.0,0.9,0.9,1.0);\n"; // FIXME!!!
+            //outStream << 
+            //      //"    fragColour.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            //      //fragColor_ << ".rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            //        fragColor_ << "= vec4(0.0,0.9,0.9,1.0);\n"; // FIXME!!!
 
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
@@ -673,25 +702,25 @@ namespace Ogre
             if (tt == RENDER_COMPOSITE_MAP)
             {
                 // Lighting embedded in alpha
-                outStream <<
-                    //"    fragColour.a = shadow;\n";
-                    //fragColor_ << ".a = shadow;\n";
-                    fragColor_ << "= vec4(0.9,0.0,0.9,1.0);\n"; // FIXME!!!
+                //outStream <<
+                //    //"    fragColour.a = shadow;\n";
+                //    //fragColor_ << ".a = shadow;\n";
+                //    fragColor_ << "= vec4(0.9,0.0,0.9,1.0);\n"; // FIXME!!!
             }
             else
             {
                 // Apply specular
-                outStream << 
-                      //"    fragColour.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
-                      //fragColor_ << ".rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
-                    fragColor_ << "= vec4(0.9,0.5,0.9,1.0);\n"; // FIXME!!!
+                //outStream << 
+                //      //"    fragColour.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                //      //fragColor_ << ".rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
+                //    fragColor_ << "= vec4(0.9,0.5,0.9,1.0);\n"; // FIXME!!!
 
                 if (prof->getParent()->getDebugLevel())
                 {
-                    outStream << 
-                        //"    fragColour.rg += lodInfo.xy;\n";
-                        //fragColor_ << ".rg += lodInfo.xy;\n";
-                    fragColor_ << "= vec4(0.5,0.9,0.0,1.0);\n"; // FIXME!!!
+                    //outStream << 
+                    //    //"    fragColour.rg += lodInfo.xy;\n";
+                    //    //fragColor_ << ".rg += lodInfo.xy;\n";
+                    //fragColor_ << "= vec4(0.5,0.9,0.0,1.0);\n"; // FIXME!!!
                 }
             }
         }
@@ -699,15 +728,17 @@ namespace Ogre
         bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
         if (fog)
         {
-            outStream << 
-                //"    fragColour.rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
-                //fragColor_ << ".rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
-                //fragColor_ << ".rgb = mix(" << fragColor_ <<".rgb, fogColour, fogVal);\n";
-                    fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
+            //outStream << 
+            //    //"    fragColour.rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
+            //    //fragColor_ << ".rgb = mix(fragColour.rgb, fogColour, fogVal);\n";
+            //    //fragColor_ << ".rgb = mix(" << fragColor_ <<".rgb, fogColour, fogVal);\n";
+            //        fragColor_ << "= vec4(0.0,0.9,0.0,1.0);\n"; // FIXME!!!
         }
-
+            //outStream << fragColor_ << "= vec4(1.0,1.0,1.0,1.0);\n"; // FIXME!!!
+            outStream << fragColor_ << "= vec4(255,255,255,255);\n"; // FIXME!!!
         // Final return
         outStream << "}\n";
+#endif
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain,

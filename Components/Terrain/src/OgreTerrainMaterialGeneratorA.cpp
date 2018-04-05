@@ -471,10 +471,12 @@ namespace Ogre
 
 		StringUtil::StrStreamType sourceStr;
 		generateVertexProgramSource(prof, terrain, tt, sourceStr);
+                //std::cout << "\n* * * Vertex Program * * *\n" << sourceStr.str() << "* * * * * *" << std::endl; // karamellpelle
 		ret->setSource(sourceStr.str());
 		ret->load();
 		defaultVpParams(prof, terrain, tt, ret);
-#if OGRE_DEBUG_MODE
+//#if OGRE_DEBUG_MODE
+#if 1
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Vertex Program: " 
 			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
 #endif
@@ -491,11 +493,13 @@ namespace Ogre
 
 		StringUtil::StrStreamType sourceStr;
 		generateFragmentProgramSource(prof, terrain, tt, sourceStr);
+                //std::cout << "\n* * * Fragment Program * * *\n" << sourceStr.str() << "* * * * * *" << std::endl; // karamellpelle
 		ret->setSource(sourceStr.str());
 		ret->load();
 		defaultFpParams(prof, terrain, tt, ret);
 
-#if OGRE_DEBUG_MODE
+//#if OGRE_DEBUG_MODE
+#if 1
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Fragment Program: " 
 			<< ret->getName() << " ***\n" << ret->getSource() << "\n***   ***";
 #endif
